@@ -27,3 +27,16 @@
 </div>
 
 {% endblock %}
+
+<form class="form-group" method="POST" enctype="multipart/form-data">
+    <div class="formfields">
+        <label for="description">Description</label><br>
+        <textarea class="form-control" id="description" name="description" required="" size="40"></textarea><br>
+    </div>
+    <div class="formfields">
+        <label for="photo">Photo</label><br>
+        <input class="form-control-file" id="photo" name="photo" required="" type="file">
+    </div><br>
+    <span></span><br>
+    <button type="submit" name="submit" class="buttons btn btn-success ">Submit</button>
+</form>

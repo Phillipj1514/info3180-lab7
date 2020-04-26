@@ -4,7 +4,7 @@ Jinja2 Documentation:    http://jinja.pocoo.org/2/documentation/
 Werkzeug Documentation:  http://werkzeug.pocoo.org/documentation/
 This file creates your application.
 """
-import os
+import os, json
 from app import app
 from flask import render_template, request,redirect, url_for, flash
 from werkzeug.utils import secure_filename
@@ -30,7 +30,7 @@ def index(path):
     """
     return render_template('index.html')
 
-@app.route('/api/upload', methods=['POST', 'GET'])
+@app.route('/api/upload', methods=['POST'])
 def upload():
     uploadform = UploadForm()
     if request.method == 'POST' and uploadform.validate_on_submit():
@@ -45,15 +45,17 @@ def upload():
             "filename": photoName,
             "description": description
             }
-        flash("Photo Upload Successfully", "success")
-        return render_template('upload.html', json=successJsonData, form=uploadform)
+        return json.dumps(successJsonData)
+        # flash("Photo Upload Successfully", "success")
+        # return render_template('upload.html', json=successJsonData, form=uploadform)
     else:
         errorJsonData = {
             "errors": form_errors(uploadform)
         }
-        flash("Photo Upload Failed", "danger")
-        return render_template('upload.html', json=errorJsonData, form=uploadform)
-    return render_template('upload.html', json= "", form=uploadform)
+        return json.dumps(errorJsonData)
+        # flash("Photo Upload Failed", "danger")
+    #     return render_template('upload.html', json=errorJsonData, form=uploadform)
+    # return render_template('upload.html', json= "", form=uploadform)
 
 
 # Here we define a function to collect form errors from Flask-WTF

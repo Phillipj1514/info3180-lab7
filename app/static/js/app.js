@@ -12,6 +12,9 @@ Vue.component('app-header', {
           <li class="nav-item active">
             <router-link class="nav-link" to="/">Home <span class="sr-only">(current)</span></router-link>
           </li>
+          <li class="nav-item">
+            <router-link class="nav-link" to="/upload">Upload</router-link>
+          </li>
         </ul>
       </div>
     </nav>
@@ -51,17 +54,58 @@ const NotFound = Vue.component('not-found', {
     }
 })
 
+const uploadForm = Vue.component('upload-form',{
+    template:`
+    <form class="form-group" id = "uploadForm" method="POST" @submit.prevent="uploadPhoto">
+        <div class="formfields">
+            <label for="description">Description</label><br>
+            <textarea class="form-control" id="description" name="description" required="" size="40"></textarea><br>
+        </div>
+        <div class="formfields">
+            <label for="photo">Photo</label><br>
+            <input class="form-control-file" id="photo" name="photo" required="" type="file">
+        </div><br>
+        <span></span><br>
+        <button type="submit" name="submit" class="buttons btn btn-success">Submit</button>
+    </form>
+    `,
+    methods:{
+        uploadPhoto(){
+            let uploadForm = document.getElementById('uploadForm');
+            let form_data = new FormData(uploadForm); 
+            fetch("/api/upload", {
+                method: 'POST',
+                body: form_data,
+                headers: {
+                    'X-CSRFToken': token
+                },
+                credentials: 'same-origin' 
+
+            }).then(function (response) {
+                return response.json();
+            }).then(function (jsonResponse) {
+                // display a success message
+                console.log(jsonResponse); 
+            }).catch(function (error) {
+                console.log(error);
+            });
+        }
+    }
+});
+
+
 // Define Routes
 const router = new VueRouter({
     mode: 'history',
     routes: [
         {path: "/", component: Home},
         // Put other routes here
-
+        {path: "/upload", component: uploadForm},
         // This is a catch all route in case none of the above matches
         {path: "*", component: NotFound}
     ]
 });
+
 
 // Instantiate our main Vue Instance
 let app = new Vue({
