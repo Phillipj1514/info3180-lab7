@@ -4,9 +4,11 @@ Jinja2 Documentation:    http://jinja.pocoo.org/2/documentation/
 Werkzeug Documentation:  http://werkzeug.pocoo.org/documentation/
 This file creates your application.
 """
-
+import os
 from app import app
-from flask import render_template, request
+from flask import render_template, request,redirect, url_for, flash
+from werkzeug.utils import secure_filename
+from .forms import UploadForm
 
 ###
 # Routing for your application.
@@ -28,6 +30,31 @@ def index(path):
     """
     return render_template('index.html')
 
+@app.route('/api/upload', methods=['POST', 'GET'])
+def upload():
+    uploadform = UploadForm()
+    if request.method == 'POST' and uploadform.validate_on_submit():
+        description = uploadform.description.data
+        photo = uploadform.photo.data
+        photoName = secure_filename(photo.filename)
+        photo.save(os.path.join(
+            app.config['UPLOAD_FOLDER'],photoName
+        ))
+        successJsonData = {
+            "message": "File Upload Successful",
+            "filename": photoName,
+            "description": description
+            }
+        flash("Photo Upload Successfully", "success")
+        return render_template('upload.html', json=successJsonData, form=uploadform)
+    else:
+        errorJsonData = {
+            "errors": form_errors(uploadform)
+        }
+        flash("Photo Upload Failed", "danger")
+        return render_template('upload.html', json=errorJsonData, form=uploadform)
+    return render_template('upload.html', json= "", form=uploadform)
+
 
 # Here we define a function to collect form errors from Flask-WTF
 # which we can later use
@@ -48,7 +75,13 @@ def form_errors(form):
 ###
 # The functions below should be applicable to all Flask apps.
 ###
-
+def flash_errors(form):
+    for field, errors in form.errors.items():
+        for error in errors:
+            flash(u"Error in the %s field - %s" % (
+                getattr(form, field).label.text,
+                error
+            ), 'danger')
 
 @app.route('/<file_name>.txt')
 def send_text_file(file_name):

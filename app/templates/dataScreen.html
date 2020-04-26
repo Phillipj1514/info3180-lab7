@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block main %}
+<div>
+    <h1>The JSon data screen</h1>
+    <div >
+        {% include "flash_messages.html"%}
+    </div>
+    <div>
+        <p>{{json}}</p>
+    </div>
+</div>
+{% endblock %}

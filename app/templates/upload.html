@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block main %}
+<div>
+    <h1>The Upload  Form </h1>
+    <div >
+        {% include "flash_messages.html"%}
+    </div>
+    <div>
+        <p>{{json}}</p>
+    </div>
+    <div>
+        <form class = "form-group" method="POST" enctype="multipart/form-data" action="{{ url_for('upload') }}">
+            {{ form.csrf_token }}
+            <div class ="formfields">
+                {{ form.description.label }}<br/>
+                {{ form.description(size=40, class="form-control") }}<br/>
+            </div>
+            <div class ="formfields">
+                {{ form.photo.label }}<br>
+                {{ form.photo(class="form-control-file") }}
+            </div><br>
+            <span></span><br/>
+            <button type="submit" name="submit" class="buttons btn btn-success " >Submit</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
