@@ -56,23 +56,32 @@ const NotFound = Vue.component('not-found', {
 
 const uploadForm = Vue.component('upload-form',{
     template:`
-    <form class="form-group" id = "uploadForm" method="POST" @submit.prevent="uploadPhoto">
-        <div class="formfields">
-            <label for="description">Description</label><br>
-            <textarea class="form-control" id="description" name="description" required="" size="40"></textarea><br>
+    <div>
+        <div v-bind:class="[status]">
+            <div v-if="code">{{messages}}</div>
+            <ul v-else>
+                <li v-for ="msg in messages">{{ msg }}</li>
+            </ul>
         </div>
-        <div class="formfields">
-            <label for="photo">Photo</label><br>
-            <input class="form-control-file" id="photo" name="photo" required="" type="file">
-        </div><br>
-        <span></span><br>
-        <button type="submit" name="submit" class="buttons btn btn-success">Submit</button>
-    </form>
+        <form class="form-group" id = "uploadForm" method="POST" @submit.prevent="uploadPhoto">
+            <div class="formfields">
+                <label for="description">Description</label><br>
+                <textarea class="form-control" id="description" name="description" required="" size="40"></textarea><br>
+            </div>
+            <div class="formfields">
+                <label for="photo">Photo</label><br>
+                <input class="form-control-file" id="photo" name="photo" required="" type="file">
+            </div><br>
+            <span></span><br>
+            <button type="submit" name="submit" class="buttons btn btn-success">Submit</button>
+        </form>
+    </div>
     `,
     methods:{
         uploadPhoto(){
             let uploadForm = document.getElementById('uploadForm');
             let form_data = new FormData(uploadForm); 
+            let self = this;
             fetch("/api/upload", {
                 method: 'POST',
                 body: form_data,
@@ -85,11 +94,29 @@ const uploadForm = Vue.component('upload-form',{
                 return response.json();
             }).then(function (jsonResponse) {
                 // display a success message
-                console.log(jsonResponse); 
+                console.log(jsonResponse);
+                if(Object.keys(jsonResponse).length > 1){
+                    self.status = "alert alert-success";
+                    self.messages = "File Upload Successful";
+                    self.code = true
+                }else{
+                    self.status = "alert alert-danger";
+                    self.messages = jsonResponse.errors;
+                    self.code = false;
+                }
             }).catch(function (error) {
                 console.log(error);
+                
             });
         }
+    },
+    data(){
+        return {
+            status:'',
+            messages:'',
+            code:true
+        }
+
     }
 });
 
@@ -110,5 +137,8 @@ const router = new VueRouter({
 // Instantiate our main Vue Instance
 let app = new Vue({
     el: "#app",
-    router
+    router,
+    data:{
+        flash: false
+    }
 });
